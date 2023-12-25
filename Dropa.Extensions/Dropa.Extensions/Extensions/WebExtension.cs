@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Drawing;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -10,6 +9,41 @@ namespace Dropa.Extensions.Extensions
 {
     public static class WebExtensions
     {
+        public static string GetIdClaim(this System.Security.Claims.ClaimsPrincipal _user)
+        {
+            var id = _user.Claims.FirstOrDefault(a => a.Type == "ID")?.Value;
+            try
+            {
+                if (id == null)
+                {
+                    id = _user.Claims.FirstOrDefault(a => a.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                }
+                if (id == null)
+                {
+                    var _id = _user.Claims.ToList()[0].Value;
+                    if (_id != null) id = _id;
+                }
+            }
+            catch
+            {
+            }
+            return id;
+        }
+
+        public static string GetEmailClaim(this System.Security.Claims.ClaimsPrincipal _user)
+        {
+            return _user.Claims.FirstOrDefault(a => a.Type == "Email")?.Value;
+        }
+
+        /// <summary>
+        /// tr | en gibi kısa dil bilgisi gönderir.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLocale()
+        {
+            return Thread.CurrentThread.CurrentCulture.Parent.Name;
+        }
+
         public static string HtmlToText(this string HTMLText, bool HtmlDecode = true)
         {
             if (HTMLText == null)
